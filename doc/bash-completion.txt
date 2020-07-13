@@ -20,6 +20,8 @@ By default, the plugin loads the bash completion from
 installed at a different location on your system, set the BASH_COMPLETION_DIR
 environment variable to the path on which the bash-completion script is
 installed.
+For example, when bash-completion is installed on Mac with Homebrew,
+BASH_COMPLETION_DIR is /usr/local/share/bash-completion.
 
 ===============================================================================
 Section 2: Example                                     *BashCompletionExamples*
@@ -41,9 +43,27 @@ completion: >
         let l:words = split(a:CmdLine)
         let l:words[0] = 'make'
         let l:command = join(l:words)
-        return bash#complete(l:command)
+        return g:bash#complete(l:command)
     endfunction
 <
+However, split and join will lose trailing spaces. Sometimes they make a
+difference. For example, >
+
+    bash#complete('git')
+
+return commands which start with "git", and
+>
+    bash#complete('git ')
+
+returns git subcommands.
+*substitute()* can be used. >
+
+    function MakeCommandCompletion(ArgLead, CmdLine, CursorPos)
+        let l:command = substitute(a:CmdLine, '^\a\+', 'make', '')
+        return g:bash#complete(l:command)
+    endfunction
+
+
 ===============================================================================
 Section 3: License                                      *BashCompletionLicense*
 
@@ -55,3 +75,9 @@ Section 4: Credits                                      *BashCompletionCredits*
 The underlying script triggering the bash completion is based on
 https://brbsix.github.io/2015/11/29/accessing-tab-completion-programmatically-in-bash/
 written by Brian Beffa <brbsix@gmail.com>.
+
+Original author of this plugin
+https://github.com/rantasub/vim-bash-completion
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:
